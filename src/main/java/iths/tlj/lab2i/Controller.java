@@ -27,13 +27,13 @@ public class Controller {
         return "Here I am";
     }
 
-    //CREATE METHODS
+    //CREATE (POST) METHODS
     //If you make a post request at this address you will create a new Json object in the database.
     @PostMapping("/guitarist")
     @ResponseStatus(HttpStatus.CREATED)     //Gives a 201 CREATED response instead of simply 200 OK.
     public ResponseEntity<?> createGuitarist(@RequestBody Guitarist guitarist) {
         if (guitaristRepository.existsById(guitarist.getId())){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
         }else
         System.out.println("New guitarist object created");
         guitaristRepository.save(guitarist);
@@ -41,15 +41,21 @@ public class Controller {
                         "\n" + guitarist.getLastName() + "\n" + guitarist.getNationality() + "\nhas been created.");
     }
 
-    //READ METHODS
+
+    //READ (GET) METHODS
     //map method to url. The get request at url returns list of all users
     @GetMapping("/guitarists")
+    @ResponseStatus(HttpStatus.OK)
     public List<Guitarist> listAllGuitarists() {
+        if (guitaristRepository.findAll().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         return guitaristRepository.findAll();
     }
 
     //get request at url returns single object from id
     @GetMapping("/id/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Guitarist findGuitaristById(@PathVariable int id) {
         if(!guitaristRepository.existsById(id)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -59,6 +65,7 @@ public class Controller {
     }
 
     @GetMapping("/firstname/{firstname}")
+    @ResponseStatus(HttpStatus.OK)
     public List<Guitarist> findGuitaristsByFirst(@PathVariable String firstname) {
         if (guitaristRepository.findAllByFirstName(firstname).isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -67,6 +74,7 @@ public class Controller {
     }
 
     @GetMapping("/lastname/{lastname}")
+    @ResponseStatus(HttpStatus.OK)
     public List<Guitarist> findGuitaristsByLast(@PathVariable String lastname) {
         if (guitaristRepository.findAllByLastName(lastname).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -75,6 +83,7 @@ public class Controller {
     }
 
     @GetMapping("/nationality/{nationality}")
+    @ResponseStatus(HttpStatus.OK)
     public List<Guitarist> findGuitaristsByNationality(@PathVariable String nationality) {
         if (guitaristRepository.findAllByNationality(nationality).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -82,11 +91,12 @@ public class Controller {
         return guitaristRepository.findAllByNationality(nationality);
     }
 
-    //UPDATE METHODS
+    //UPDATE (PUT & PATCH) METHODS
     @PutMapping("update")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> updateGuitarist(@RequestBody Guitarist guitarist) {
         if (!guitaristRepository.existsById(guitarist.getId())){
-            throw new ResponseStatusException(HttpStatus.NOT_MODIFIED);
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
         }else
             guitaristRepository.save(guitarist);
         System.out.println("Guitarist has been updated.");
@@ -94,8 +104,26 @@ public class Controller {
                 "\n" + guitarist.getLastName() + "\n" + guitarist.getNationality());
     }
 
+
+    //NEED PATCH METHODS HERE
+    //https://nullbeans.com/using-put-vs-patch-when-building-a-rest-api-in-spring/#How_to_Configure_HTTP_PATCH_in_a_REST_controller_in_Spring
+    @PatchMapping("/patch/firstname/{id}")
+    public ResponseEntity<?> patchFirstName(){
+
+    }
+
+    @PatchMapping("/patch/lastname/{id}")
+    public ResponseEntity<?> patchLastName(){
+
+    }
+
+    @PatchMapping("/patch/nationality/{id}")
+    public ResponseEntity<?> patchNationality(){
+
+    }
+
     //DELETE METHODS
-    //url for deleting an object. If the ID does not exist, a bad request exception is thrown.
+    //url for deleting an object. If the ID does not exist, exception is thrown.
     //@PostMapping("/delete")
     @DeleteMapping("/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -105,6 +133,6 @@ public class Controller {
             System.out.println("Guitarist deleted.");
             return ResponseEntity.ok("Deleted entry with ID: " + guitarist.getId());
         } else
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 }
