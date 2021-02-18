@@ -3,12 +3,12 @@ package iths.tlj.lab2i;
 import javax.persistence.*;
 
 @Entity
-@Table(name="Guitarists")
+@Table(name="guitarists")
 
 public class Guitarist {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String firstName;
     private String lastName;
