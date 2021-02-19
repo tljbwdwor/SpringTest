@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Data
-@RestController
+@RestController("/guitarists")
 public class GuitaristController {
 
     //ORIGINAL VERSION WITHOUT SERVICE CLASS OR DTO
@@ -58,7 +58,7 @@ public class GuitaristController {
 
     //CREATE (POST) METHODS
     //If you make a post request at this address you will create a new Json object in the database.
-    @PostMapping("/guitarist")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)     //Gives a 201 CREATED response instead of simply 200 OK.
     public GuitaristDto createGuitarist(@RequestBody GuitaristDto guitarist) {
         return guitaristService.createGuitarist(guitarist);
@@ -67,13 +67,13 @@ public class GuitaristController {
 
     //READ (GET) METHODS
     //map method to url. The get request at url returns list of all users
-    @GetMapping("/guitarists")
+    @GetMapping()
     public List<GuitaristDto> listAllGuitarists() {
         return guitaristService.getAllGuitarists();
     }
 
     //get request at url returns single object from id
-    @GetMapping("/guitarist/{id}")
+    @GetMapping("/{id}")
     public Optional<GuitaristDto> findGuitaristById(@PathVariable int id) {
         return guitaristService.getOne(id);
     }
@@ -104,22 +104,22 @@ public class GuitaristController {
 
     //UPDATE (PUT) METHODS
 
-    @PutMapping("/guitarists/{id}")
+    @PutMapping("/{id}")
     public GuitaristDto replace(@RequestBody GuitaristDto guitaristDto, @PathVariable int id){
         return guitaristService.replace(id, guitaristDto);
     }
 
-    @PatchMapping("/guitarists/firstname/{id}")
+    @PatchMapping("/firstname/{id}")
     public GuitaristDto updateFirst(@RequestBody FirstNameDto firstNameDto, @PathVariable int id){
         return guitaristService.updateFirst(id, firstNameDto);
     }
 
-    @PatchMapping("/guitarists/lastname/{id}")
+    @PatchMapping("/lastname/{id}")
     public GuitaristDto updateLast(@RequestBody LastNameDto lastNameDto, @PathVariable int id){
         return guitaristService.updateLast(id, lastNameDto);
     }
 
-    @PatchMapping("/guitarists/nationality/{id}")
+    @PatchMapping("/nationality/{id}")
     public GuitaristDto updateNationality(@RequestBody NationalityDto nationalityDto, @PathVariable int id){
         return guitaristService.updateNationality(id, nationalityDto);
     }
@@ -161,7 +161,7 @@ public class GuitaristController {
     //DELETE METHODS
     //url for deleting an object. If the ID does not exist, exception is thrown.
     //@PostMapping("/delete")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String deleteGuitarist(@PathVariable int id) {
         guitaristService.delete(id);
         return "Guitarist with id " + id + " has been deleted.";
