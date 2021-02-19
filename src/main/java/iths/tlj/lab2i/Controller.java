@@ -1,5 +1,6 @@
 package iths.tlj.lab2i;
 
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Data
 @RestController
 public class Controller {
 
@@ -22,9 +25,25 @@ public class Controller {
     }
 
     //TEST HTTP METHOD
-    @GetMapping("/test")
-    public String test() {
-        return "Here I am";
+    //simple test class using Lombok to avoid boilerplate
+    @Data
+    public class Greeting {
+
+        private final long id;
+        private final String content;
+
+        public Greeting(long id, String content) {
+            this.id = id;
+            this.content = content;
+        }
+    }
+    //simple test method to print hello + name or default
+    private static final String template = "Good day to you, %s!";
+    private final AtomicLong counter = new AtomicLong();
+    @GetMapping("/hi")
+    public Greeting greeting(@RequestParam(value = "name", defaultValue = "my dude") String name){
+        return new Greeting(counter.incrementAndGet(),
+                String.format(template, name));
     }
 
     //CREATE (POST) METHODS
@@ -104,12 +123,52 @@ public class Controller {
                 "\n" + guitarist.getLastName() + "\n" + guitarist.getNationality());
     }
 
+    //Update by ID
+    @PutMapping("/update/{id}")
+    Guitarist replaceGuitarist(@RequestBody Guitarist newGuitarist, @PathVariable int id){
+        return guitaristRepository.findById(id).map(guitarist -> {
+            guitarist.setFirstName(newGuitarist.getFirstName());
+            guitarist.setLastName(newGuitarist.getLastName());
+            guitarist.setNationality(newGuitarist.getNationality());
+            return guitaristRepository.save(guitarist);
+        }).orElseGet(() -> {
+            newGuitarist.setId(id);
+            return guitaristRepository.save(newGuitarist);
+        });
+    }
+
 
     //NEED PATCH METHODS HERE
-    //https://nullbeans.com/using-put-vs-patch-when-building-a-rest-api-in-spring/#How_to_Configure_HTTP_PATCH_in_a_REST_controller_in_Spring
-    @PatchMapping("/patch/firstname/{id}")
-    public ResponseEntity<?> patchFirstName(){
 
+    private GuitaristRestModel mapPersistenceModelToRestModel(Guitarist guitarist) {
+        GuitaristRestModel guitaristRestModel = new GuitaristRestModel();
+        guitaristRestModel.setId(guitarist.getId());
+        guitaristRestModel.setFirstname(guitarist.getFirstName());
+        guitaristRestModel.setLastname(guitarist.getLastName());
+        guitaristRestModel.setNationality(guitarist.getNationality());
+        return guitaristRestModel;
+    }
+
+    private void mapRestModelToPersistenceModel(GuitaristRestModel guitaristRestModel, Guitarist guitarist){
+        guitarist.setFirstName(guitaristRestModel.getFirstname());
+        guitarist.setLastName(guitaristRestModel.getLastname());
+        guitarist.setNationality(guitaristRestModel.getNationality());
+        guitarist.setId(guitaristRestModel.getId());
+    }
+    //https://nullbeans.com/using-put-vs-patch-when-building-a-rest-api-in-spring/#How_to_Configure_HTTP_PATCH_in_a_REST_controller_in_Spring
+    /*@PatchMapping("/patch/firstname/{id}")
+    public ResponseEntity patchFirstName(@PathVariable int id, @RequestBody Map<String, Object> changes){
+        Guitarist guitarist = guitaristRepository.findById(id).get();
+        GuitaristRestModel guitaristRestModel = mapPersistenceModelToRestModel(guitarist);
+        changes.forEach(
+                (change, value) -> {
+                    switch (change){
+                        case "firstname": guitaristRestModel.setFirstname((String) value); break;
+                        case "lastname": guitaristRestModel.setLastname((String) value); break;
+                        case "nationality": guitaristRestModel.setNationality((String) value); break;
+                    }
+                }
+        );
     }
 
     @PatchMapping("/patch/lastname/{id}")
@@ -120,7 +179,7 @@ public class Controller {
     @PatchMapping("/patch/nationality/{id}")
     public ResponseEntity<?> patchNationality(){
 
-    }
+    }*/
 
     //DELETE METHODS
     //url for deleting an object. If the ID does not exist, exception is thrown.

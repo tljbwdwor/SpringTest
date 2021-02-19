@@ -1,7 +1,10 @@
 package iths.tlj.lab2i;
 
+import lombok.*;
+
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name="guitarists")
 
@@ -25,35 +28,4 @@ public class Guitarist {
 
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getNationality() {
-        return nationality;
-    }
-
-    public void setNationality(String nationality) {
-        this.nationality = nationality;
-    }
 }
