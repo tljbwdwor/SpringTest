@@ -1,4 +1,4 @@
-package iths.tlj.lab2i;
+package iths.tlj.lab2i.entities;
 
 import lombok.*;
 

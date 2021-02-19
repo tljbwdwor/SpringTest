@@ -1,5 +1,6 @@
-package iths.tlj.lab2i;
+package iths.tlj.lab2i.repositories;
 
+import iths.tlj.lab2i.entities.Guitarist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
