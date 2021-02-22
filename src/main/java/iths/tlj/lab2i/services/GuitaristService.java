@@ -45,6 +45,17 @@ public class GuitaristService {
             return guitaristMapper.map(guitaristRepository.findById(id));
     }
 
+    public List<GuitaristDto> findGuitaristsByFirst(String firstName) {
+        return guitaristMapper.map(guitaristRepository.findAllByFirstName(firstName));
+    }
+
+    public List<GuitaristDto> findGuitaristsByLast(String lastName) {
+        return guitaristMapper.map(guitaristRepository.findAllByLastName(lastName));
+    }
+
+    public List<GuitaristDto> findGuitaristsByNationality(String nationality) {
+        return guitaristMapper.map(guitaristRepository.findAllByNationality(nationality));
+    }
 
     //UPDATE (PUT) METHODS
     public GuitaristDto replace(int id, GuitaristDto guitaristDto) {

@@ -78,37 +78,30 @@ public class GuitaristController {
         return guitaristService.getOne(id);
     }
 
-   /* @GetMapping("/firstname/{firstname}")
-    public List<Guitarist> findGuitaristsByFirst(@PathVariable String firstname) {
-        if (guitaristRepository.findAllByFirstName(firstname).isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }else
-        return guitaristRepository.findAllByFirstName(firstname);
+    //get request at url returns list of all sharing first name (last name and nationality below)
+    @GetMapping("/firstname/{firstname}")
+    public List<GuitaristDto> findAllByFirstName(@PathVariable String firstname) {
+        return guitaristService.findGuitaristsByFirst(firstname);
     }
 
-    @GetMapping("/lastname/{lastname}")
-    public List<Guitarist> findGuitaristsByLast(@PathVariable String lastname) {
-        if (guitaristRepository.findAllByLastName(lastname).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }else
-        return guitaristRepository.findAllByLastName(lastname);
+    @GetMapping("lastname/{lastname}")
+    public List<GuitaristDto> findAllByLastName(@PathVariable String lastname) {
+        return guitaristService.findGuitaristsByLast(lastname);
     }
 
-    @GetMapping("/nationality/{nationality}")
-    public List<Guitarist> findGuitaristsByNationality(@PathVariable String nationality) {
-        if (guitaristRepository.findAllByNationality(nationality).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }else
-        return guitaristRepository.findAllByNationality(nationality);
-    }*/
+    @GetMapping("nationality/{nationality}")
+    public List<GuitaristDto> findAllByNationality(@PathVariable String nationality) {
+        return guitaristService.findGuitaristsByNationality(nationality);
+    }
 
-    //UPDATE (PUT) METHODS
 
+    //REPLACE (PUT) METHODS
     @PutMapping("/guitarists/{id}")
     public GuitaristDto replace(@RequestBody GuitaristDto guitaristDto, @PathVariable int id){
         return guitaristService.replace(id, guitaristDto);
     }
 
+    //UPDATE (PATCH) METHODS
     @PatchMapping("/guitarists/firstname/{id}")
     public GuitaristDto updateFirst(@RequestBody FirstNameDto firstNameDto, @PathVariable int id){
         return guitaristService.updateFirst(id, firstNameDto);
@@ -124,52 +117,11 @@ public class GuitaristController {
         return guitaristService.updateNationality(id, nationalityDto);
     }
 
-   /* @PutMapping("update")
-    public ResponseEntity<?> updateGuitarist(@RequestBody Guitarist guitarist) {
-        if (!guitaristRepository.existsById(guitarist.getId())){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-        }else
-            guitaristRepository.save(guitarist);
-        System.out.println("Guitarist has been updated.");
-        return ResponseEntity.ok("Entry updated to:\n" + guitarist.getId() + "\n" + guitarist.getFirstName() +
-                "\n" + guitarist.getLastName() + "\n" + guitarist.getNationality());
-    }
-
-    //Update by ID
-    @PutMapping("/update/{id}")
-    Guitarist replaceGuitarist(@RequestBody Guitarist newGuitarist, @PathVariable int id){
-        return guitaristRepository.findById(id).map(guitarist -> {
-            guitarist.setFirstName(newGuitarist.getFirstName());
-            guitarist.setLastName(newGuitarist.getLastName());
-            guitarist.setNationality(newGuitarist.getNationality());
-            return guitaristRepository.save(guitarist);
-        }).orElseGet(() -> {
-            newGuitarist.setId(id);
-            return guitaristRepository.save(newGuitarist);
-        });
-    }*/
-
-
-    //NEED PATCH METHODS HERE
-
-
-    //https://nullbeans.com/using-put-vs-patch-when-building-a-rest-api-in-spring/#How_to_Configure_HTTP_PATCH_in_a_REST_controller_in_Spring
-
-
-
 
     //DELETE METHODS
-    //url for deleting an object. If the ID does not exist, exception is thrown.
-    //@PostMapping("/delete")
     @DeleteMapping("/delete/{id}")
     public String deleteGuitarist(@PathVariable int id) {
         guitaristService.delete(id);
         return "Guitarist with id " + id + " has been deleted.";
-        /*if(guitaristRepository.existsById(guitarist.getId())) {
-            guitaristRepository.delete(guitarist);
-            System.out.println("Guitarist deleted.");
-            return ResponseEntity.ok("Deleted entry with ID: " + guitarist.getId());
-        } else
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);*/
     }
 }
