@@ -23,9 +23,12 @@ public class MvcTest {
 
     @Autowired
     private MockMvc mockMvc;
+    private final GuitaristDto TestDto = new GuitaristDto(1,"Jimi","Hendrix","American");
+
 
     @Test
     void urlGuitaristsReturnsAllObjectsAsJason() throws Exception {
+        //Test that getAll returns status of 200 and that it is not null
         when(service.getAllGuitarists()).thenReturn(List.of(new GuitaristDto()));
 
         var result = mockMvc.perform(MockMvcRequestBuilders.get("/guitarists")
@@ -34,18 +37,22 @@ public class MvcTest {
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
         assertThat(result).isNotNull();
 
+
+        //Test that created item gives a status of 201
         var result2 =
                 mockMvc.perform(MockMvcRequestBuilders.post("/guitarist")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": 1,\n" +
-                                "    \"firstName\": \"Jimi\",\n" +
-                                "    \"lastName\": \"Hendrix\",\n" +
-                                "    \"nationality\": \"American\"\n" +
-                                "  }")
+                        .content("""
+                                {"id": 1,
+                                    "firstName": "Jimi",
+                                    "lastName": "Hendrix",
+                                    "nationality": "American"
+                                  }""")
                         .accept(MediaType.APPLICATION_JSON))
                         .andReturn();
 
 
         assertThat(result2.getResponse().getStatus()).isEqualTo(201);
+
     }
 }
