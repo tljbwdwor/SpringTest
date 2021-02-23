@@ -17,12 +17,6 @@ class GuitaristControllerTest {
     //Initialising outside of methods which can all call
     GuitaristController guitaristController = new GuitaristController(new TestService());
 
-    //Test that programme loads correctly
-    @Test
-    void contextLoads() throws Exception {
-        assertThat(guitaristController).isNotNull();
-    }
-
     //CREATE TESTS
     @Test
     void createReturnsValidAndCorrectGuitarist() {
