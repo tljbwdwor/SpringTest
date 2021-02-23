@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class GuitaristService {
+public class GuitaristService implements iths.tlj.lab2i.services.Service {
     private final GuitaristMapper guitaristMapper = new GuitaristMapper();
     //sits between Controller and repository to help validation.
     //for every method in Controller, we need an answering method here.

@@ -4,13 +4,13 @@ import iths.tlj.lab2i.dtos.FirstNameDto;
 import iths.tlj.lab2i.dtos.GuitaristDto;
 import iths.tlj.lab2i.dtos.LastNameDto;
 import iths.tlj.lab2i.dtos.NationalityDto;
-import iths.tlj.lab2i.services.GuitaristService;
+import iths.tlj.lab2i.services.Service;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Data
@@ -27,10 +27,15 @@ public class GuitaristController {
     }*/
 
     //Using dependency injection here; creating new instances below, we would need all the @Override methods in the code
-    private GuitaristService guitaristService;
+    /*private GuitaristService guitaristService;
 
-    public GuitaristController(GuitaristService guitaristService){this.guitaristService = guitaristService;}
+    public GuitaristController(GuitaristService guitaristService){this.guitaristService = guitaristService;}*/
 
+    private final Service service;
+
+    public GuitaristController(Service service) {
+        this.service = service;
+    }
 
 
     //TEST HTTP METHOD
@@ -61,7 +66,7 @@ public class GuitaristController {
     @PostMapping("/guitarist")
     @ResponseStatus(HttpStatus.CREATED)     //Gives a 201 CREATED response instead of simply 200 OK.
     public GuitaristDto createGuitarist(@RequestBody GuitaristDto guitarist) {
-        return guitaristService.createGuitarist(guitarist);
+        return service.createGuitarist(guitarist);
     }
 
 
@@ -69,59 +74,60 @@ public class GuitaristController {
     //map method to url. The get request at url returns list of all users
     @GetMapping("/guitarists")
     public List<GuitaristDto> listAllGuitarists() {
-        return guitaristService.getAllGuitarists();
+        return service.getAllGuitarists();
     }
 
     //get request at url returns single object from id
     @GetMapping("/guitarist/{id}")
-    public Optional<GuitaristDto> findGuitaristById(@PathVariable int id) {
-        return guitaristService.getOne(id);
+    public GuitaristDto findGuitaristById(@PathVariable int id) {
+        return service.getOne(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id " + id + " not found."));
     }
 
     //get request at url returns list of all sharing first name (last name and nationality below)
     @GetMapping("/firstname/{firstname}")
     public List<GuitaristDto> findAllByFirstName(@PathVariable String firstname) {
-        return guitaristService.findGuitaristsByFirst(firstname);
+        return service.findGuitaristsByFirst(firstname);
     }
 
     @GetMapping("lastname/{lastname}")
     public List<GuitaristDto> findAllByLastName(@PathVariable String lastname) {
-        return guitaristService.findGuitaristsByLast(lastname);
+        return service.findGuitaristsByLast(lastname);
     }
 
     @GetMapping("nationality/{nationality}")
     public List<GuitaristDto> findAllByNationality(@PathVariable String nationality) {
-        return guitaristService.findGuitaristsByNationality(nationality);
+        return service.findGuitaristsByNationality(nationality);
     }
 
 
     //REPLACE (PUT) METHODS
     @PutMapping("/guitarists/{id}")
     public GuitaristDto replace(@RequestBody GuitaristDto guitaristDto, @PathVariable int id){
-        return guitaristService.replace(id, guitaristDto);
+        return service.replace(id, guitaristDto);
     }
 
     //UPDATE (PATCH) METHODS
     @PatchMapping("/guitarists/firstname/{id}")
     public GuitaristDto updateFirst(@RequestBody FirstNameDto firstNameDto, @PathVariable int id){
-        return guitaristService.updateFirst(id, firstNameDto);
+        return service.updateFirst(id, firstNameDto);
     }
 
     @PatchMapping("/guitarists/lastname/{id}")
     public GuitaristDto updateLast(@RequestBody LastNameDto lastNameDto, @PathVariable int id){
-        return guitaristService.updateLast(id, lastNameDto);
+        return service.updateLast(id, lastNameDto);
     }
 
     @PatchMapping("/guitarists/nationality/{id}")
     public GuitaristDto updateNationality(@RequestBody NationalityDto nationalityDto, @PathVariable int id){
-        return guitaristService.updateNationality(id, nationalityDto);
+        return service.updateNationality(id, nationalityDto);
     }
 
 
     //DELETE METHODS
     @DeleteMapping("/delete/{id}")
     public String deleteGuitarist(@PathVariable int id) {
-        guitaristService.delete(id);
+        service.delete(id);
         return "Guitarist with id " + id + " has been deleted.";
     }
 }

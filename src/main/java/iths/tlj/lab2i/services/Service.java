@@ -13,8 +13,11 @@ public interface Service {
     GuitaristDto createGuitarist(GuitaristDto guitarist);
 
     List<GuitaristDto> getAllGuitarists();
+    Optional<GuitaristDto> getOne(int id);
+    List<GuitaristDto> findGuitaristsByFirst(String firstname);
+    List<GuitaristDto> findGuitaristsByLast(String lastname);
+    List<GuitaristDto> findGuitaristsByNationality(String nationality);
 
-    Optional<GuitaristDto> getSingleGuitarist();
 
     GuitaristDto replace(int id, GuitaristDto guitaristDto);
 
