@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class Lab2iApplicationTests {
@@ -26,6 +27,7 @@ class Lab2iApplicationTests {
         headers.add("Accept","application.xml");
         var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists", GuitaristDto[].class);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertTrue(result.hasBody());
         assertThat(result.getBody().length).isGreaterThan(0);
     }
 
