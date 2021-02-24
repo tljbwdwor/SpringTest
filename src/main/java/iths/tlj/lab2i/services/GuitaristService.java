@@ -29,7 +29,7 @@ public class GuitaristService implements iths.tlj.lab2i.services.Service {
     public GuitaristDto createGuitarist(GuitaristDto guitarist) {
         //validate here
         if (guitarist.getFirstName().isEmpty() || guitarist.getNationality().isEmpty())
-            throw new RuntimeException();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         return guitaristMapper.map(guitaristRepository.save(guitaristMapper.map(guitarist)));
     }
 
@@ -46,14 +46,20 @@ public class GuitaristService implements iths.tlj.lab2i.services.Service {
     }
 
     public List<GuitaristDto> findGuitaristsByFirst(String firstName) {
+        if(guitaristMapper.map(guitaristRepository.findAllByFirstName(firstName)).isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return guitaristMapper.map(guitaristRepository.findAllByFirstName(firstName));
     }
 
     public List<GuitaristDto> findGuitaristsByLast(String lastName) {
+        if(guitaristMapper.map(guitaristRepository.findAllByLastName(lastName)).isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return guitaristMapper.map(guitaristRepository.findAllByLastName(lastName));
     }
 
     public List<GuitaristDto> findGuitaristsByNationality(String nationality) {
+        if(guitaristMapper.map(guitaristRepository.findAllByNationality(nationality)).isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return guitaristMapper.map(guitaristRepository.findAllByNationality(nationality));
     }
 

@@ -6,6 +6,7 @@ import iths.tlj.lab2i.dtos.LastNameDto;
 import iths.tlj.lab2i.dtos.NationalityDto;
 import iths.tlj.lab2i.services.Service;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,8 +63,9 @@ public class TestService implements Service {
 
     @Override
     public GuitaristDto replace(int id, GuitaristDto guitaristDto) {
-        System.out.println(setUpDummyObjects().length);
-
+        GuitaristDto newData = new GuitaristDto(1, "T1", "T1", "T1");
+        GuitaristDto data = Mockito.mock(GuitaristDto.class);
+        //when(replace(1,data,newData))
         return guitaristDto;
     }
 
