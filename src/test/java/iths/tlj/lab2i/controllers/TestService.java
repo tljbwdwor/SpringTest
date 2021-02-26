@@ -5,7 +5,6 @@ import iths.tlj.lab2i.dtos.GuitaristDto;
 import iths.tlj.lab2i.dtos.LastNameDto;
 import iths.tlj.lab2i.dtos.NationalityDto;
 import iths.tlj.lab2i.services.Service;
-import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -16,7 +15,7 @@ public class TestService implements Service {
 
     @Override
     public GuitaristDto createGuitarist(GuitaristDto guitarist) {
-        return new GuitaristDto(4,"Zakk","Wylde","American");
+        return new GuitaristDto(6,"Zakk","Wylde","American");
     }
 
     @Override
@@ -53,13 +52,6 @@ public class TestService implements Service {
         else return null;
     }
 
-    @BeforeEach
-    public GuitaristDto[] setUpDummyObjects() {
-        GuitaristDto[] testData = new GuitaristDto[2];
-        testData[0] = new GuitaristDto(1, "T1", "T1", "T1");
-        testData[1] = new GuitaristDto(2, "T2", "T2", "T2");
-        return testData;
-    }
 
     @Override
     public GuitaristDto replace(int id, GuitaristDto guitaristDto) {

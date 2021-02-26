@@ -28,9 +28,9 @@ public class GuitaristService implements iths.tlj.lab2i.services.Service {
     //CREATE (POST) METHODS
     public GuitaristDto createGuitarist(GuitaristDto guitarist) {
         //validate here
-        if (guitarist.getFirstName().isEmpty() || guitarist.getNationality().isEmpty())
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        if (!(guitarist.getFirstName() == null) && !(guitarist.getLastName() == null))
         return guitaristMapper.map(guitaristRepository.save(guitaristMapper.map(guitarist)));
+        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
     //READ (GET) METHODS

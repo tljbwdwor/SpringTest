@@ -23,6 +23,8 @@ class Lab2iApplicationTests {
 
     @Test
     void contextLoads() {
+        //This test is checking the whole app loads properly and therefore will need to be connected to the real DB,
+        // not the test one.
         HttpHeaders headers = new HttpHeaders();
         headers.add("Accept","application.xml");
         var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists", GuitaristDto[].class);
@@ -31,4 +33,29 @@ class Lab2iApplicationTests {
         assertThat(result.getBody().length).isGreaterThan(0);
     }
 
+    @Test
+    void testingGetAllWithDb() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarist/1", GuitaristDto.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertTrue(result.hasBody());
+        assertThat(result.getBody().getLastName()).isEqualTo("Hendrix");
+    }
+
+    @Test
+    void testingPostWorks() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        GuitaristDto guitaristDto = new GuitaristDto(0,"T","T","T");
+        var result = restTemplate.postForEntity("http://localhost:" + port + "/guitarist",
+                guitaristDto, GuitaristDto.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(result.getBody().getLastName()).isEqualTo("T");
+    }
+
+    @Test
+    void testingPutWorks() {
+        HttpHeaders header = new HttpHeaders();
+    }
 }

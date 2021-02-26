@@ -2,30 +2,76 @@
 package iths.tlj.lab2i.controllers;
 
 import iths.tlj.lab2i.dtos.GuitaristDto;
+import iths.tlj.lab2i.repositories.TestGuitaristRepository;
+import iths.tlj.lab2i.testEntities.TestGuitarist;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class GuitaristControllerTest {
+
+    @Autowired
+            private TestGuitaristRepository testGuitaristRepository;
 
     //Isolated unit tests.
     //Initialising outside of methods which can all call
     GuitaristController guitaristController = new GuitaristController(new TestService());
+
+   /*@BeforeEach
+    void addFreshTestData() {
+        TestGuitarist a = testGuitaristRepository
+                .save(new TestGuitarist(0,"A","A","A"));
+        TestGuitarist b = testGuitaristRepository
+                .save(new TestGuitarist(0,"B","B","B"));
+        TestGuitarist c = testGuitaristRepository
+                .save(new TestGuitarist(0,"C","C","C"));
+        TestGuitarist d = testGuitaristRepository
+                .save(new TestGuitarist(0,"D","D","D"));
+        TestGuitarist e = testGuitaristRepository
+                .save(new TestGuitarist(0,"E","E","E"));
+
+    }*/
+
+    /*@AfterEach
+    void emptyTestData() {
+        testGuitaristRepository.deleteAll();
+    }*/
+
+    @Test
+    public void testingTestDbObjectCreation() {
+        TestGuitarist testGuitarist = testGuitaristRepository
+                .save(new TestGuitarist(0,"T","T","T"));
+        Optional<TestGuitarist> foundTest = testGuitaristRepository
+                .findById(testGuitarist.getId());
+
+        assertNotNull(foundTest);
+        assertEquals(testGuitarist.getId(), foundTest.get().getId());
+    }
 
     //CREATE TESTS
     @Test
     void createReturnsValidAndCorrectGuitarist() {
         var newG = guitaristController.createGuitarist(new GuitaristDto());
 
-        assertThat(newG.getId()).isEqualTo(4);
+        assertThat(newG.getId()).isEqualTo(6);
         assertThat(newG.getFirstName()).isEqualTo("Zakk");
         assertThat(newG.getLastName()).isEqualTo("Wylde");
         assertThat(newG.getNationality()).isEqualTo("American");
+    }
+
+    @Test
+    void createValid() {
+       guitaristController.createGuitarist(new GuitaristDto());
+
     }
 
     //READ TESTS
