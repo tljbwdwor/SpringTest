@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,9 +38,11 @@ class Lab2iApplicationTests {
 
     //GET ONE BY ID
     @Test
-    void testingGetOneByIdWithDb() {
+    void getByIdReturnsOkAndJson() {
         HttpHeaders header = new HttpHeaders();
         header.add("Accept","application.xml");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
         var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/1", GuitaristDto.class);
         System.out.println("YO CHECK THIS OUT: " + result.getBody().getFirstName());
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -48,9 +50,100 @@ class Lab2iApplicationTests {
         assertThat(result.getBody().getLastName()).isEqualTo("Hendrix");
     }
 
+    //INVALID GET BY ID
+    @Test
+    void getByInvalidIdReturnsNotFound() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        header.setContentType(MediaType.APPLICATION_JSON);
 
-    //TO DO- Get these methods to return correct Json format. Fix Update Replace & delete test methods.
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/4", GuitaristDto.class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    //CREATE
+    @Test
+    void testingPostReturns201AndAddsJson() {
+        GuitaristDto guitaristDto = new GuitaristDto(4,"T","T","T");
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<GuitaristDto> request = new HttpEntity<GuitaristDto>(guitaristDto);
+        ResponseEntity<GuitaristDto> response = restTemplate
+                .postForEntity("http://localhost:" + port + "/guitarists",
+                guitaristDto, GuitaristDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody().getLastName()).isEqualTo("T");
+        assertThat(response.getBody().getFirstName()).isEqualTo(guitaristDto.getFirstName());
+    }
+
+    //INVALID CREATE
+    @Test
+    void invalidPostReturns400() {
+        GuitaristDto invalidDto = new GuitaristDto(0,null,null,null);
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<GuitaristDto> response = restTemplate
+                .postForEntity("http://localhost:" + port + "/guitarists",
+                        invalidDto, GuitaristDto.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    //REPLACE
+    @Test
+    void replaceReturns200AndJson() {
+        GuitaristDto newG = new GuitaristDto(1,"new","new","new");
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<GuitaristDto> request = new HttpEntity<GuitaristDto>(newG);
+        ResponseEntity<GuitaristDto> response = this.restTemplate.exchange("http://localhost:" + port
+                + "/guitarists/1", HttpMethod.PUT, request, GuitaristDto.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody().getFirstName()).isEqualTo(newG.getFirstName());
+    }
+
+    //INVALID REPLACE
+    @Test
+    void replaceInvalidIdReturnsNotFound() {
+        GuitaristDto newG = new GuitaristDto(1,"new","new","new");
+
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<GuitaristDto> request = new HttpEntity<GuitaristDto>(newG);
+        ResponseEntity<GuitaristDto> response = this.restTemplate.exchange("http://localhost:" + port
+                + "/guitarists/4", HttpMethod.PUT, request, GuitaristDto.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    //TO DO- fix parsing error in search methods. Fix Replace & delete test methods.
     //check out https://medium.com/swlh/https-medium-com-jet-cabral-testing-spring-boot-restful-apis-b84ea031973d
+
+    //SEARCH BY FIRST
+    @Test
+    void getByFirstReturnsOkAndJson() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application.xml");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/firstname/jimi",
+                GuitaristDto[].class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertTrue(result.hasBody());
+        assertThat(Arrays.stream(result.getBody()).findFirst().get().getLastName()).isEqualTo("Hendrix");
+    }
 
     @Test
     void testingGetOneByFirstWithDb() {
@@ -58,6 +151,7 @@ class Lab2iApplicationTests {
         header.add("Accept","application.xml");
         var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/firstname/jimi",
                 GuitaristDto[].class);
+
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertTrue(result.hasBody());
@@ -77,49 +171,15 @@ class Lab2iApplicationTests {
         assertThat(result.getBody().length).isEqualTo(1);
     }
 
-    @Test
-    void testingPostWorks() {
-        HttpHeaders header = new HttpHeaders();
-        header.add("Accept","application.xml");
-        GuitaristDto guitaristDto = new GuitaristDto(4,"T","T","T");
-        var result = restTemplate.postForEntity("http://localhost:" + port + "/guitarists",
-                guitaristDto, GuitaristDto.class);
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(result.getBody().getLastName()).isEqualTo("T");
-    }
+
+
 
     /*@Test
-    void testingPutWorks() {
-        HttpHeaders header = new HttpHeaders();
-        header.add("Accept","application.xml");
-        GuitaristDto oldG = new GuitaristDto(0,"Z","Z","Z");
-        GuitaristDto newG = new GuitaristDto(oldG.getId(), "X","X","X");
-        restTemplate.postForEntity("http:localhost:" + port + "/guitarist", oldG, GuitaristDto.class);
-        restTemplate.put("http://localhost" + port + "/guitarists" + oldG.getId(), newG, GuitaristDto.class);
-        assertThat(newG.getId()).isEqualTo(oldG.getId());
+    void validIdDeleteReturns200() {
+        ResponseEntity<String> response = this.restTemplate
+                .delete("http://localhost:" + port + "/guitarists/delete/1", HttpMethod.DELETE);
+
+
 
     }*/
-
-    /*@Test
-    void testingDeleteWorks() {
-        HttpHeaders header = new HttpHeaders();
-        header.add("Accept","application.xml");
-        GuitaristDto deleteMe = new GuitaristDto(5000,"D","D","D");
-        var result = restTemplate.postForEntity("http://localhost:" + port + "/guitarist", deleteMe, GuitaristDto.class);
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-    }*/
-
-    @Test
-    void addTestData() {
-
-        TestRestTemplate restTemplate = new TestRestTemplate();
-        GuitaristDto test1 = new GuitaristDto(1,"Jimi","Hendrix","American");
-        GuitaristDto test2 = new GuitaristDto(2,"Shawn","Lane","American");
-        var result = restTemplate.postForEntity("http://localhost:" + port + "/guitarist", test1, GuitaristDto.class);
-        var result2 = restTemplate.postForEntity("http://localhost:" + port + "/guitarist", test2, GuitaristDto.class);
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(result2.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-    }
 }
