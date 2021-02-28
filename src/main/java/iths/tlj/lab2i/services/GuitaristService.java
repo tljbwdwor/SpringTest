@@ -28,9 +28,9 @@ public class GuitaristService implements iths.tlj.lab2i.services.Service {
     //CREATE (POST) METHODS
     public GuitaristDto createGuitarist(GuitaristDto guitarist) {
         //validate here
-        if (!(guitarist.getFirstName() == null) && !(guitarist.getLastName() == null))
-        return guitaristMapper.map(guitaristRepository.save(guitaristMapper.map(guitarist)));
-        else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if ((guitarist.getFirstName() == null) || (guitarist.getNationality() == null))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        else return guitaristMapper.map(guitaristRepository.save(guitaristMapper.map(guitarist)));
     }
 
     //READ (GET) METHODS
@@ -121,7 +121,7 @@ public class GuitaristService implements iths.tlj.lab2i.services.Service {
     //DELETE METHODS
     public void delete(int id) {
         if (!guitaristRepository.existsById(id))
-            throw new RuntimeException();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         else
         guitaristRepository.deleteById(id);
     }

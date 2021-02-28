@@ -63,7 +63,7 @@ public class GuitaristController {
 
     //CREATE (POST) METHODS
     //If you make a post request at this address you will create a new Json object in the database.
-    @PostMapping("/guitarist")
+    @PostMapping("/guitarists")
     @ResponseStatus(HttpStatus.CREATED)     //Gives a 201 CREATED response instead of simply 200 OK.
     public GuitaristDto createGuitarist(@RequestBody GuitaristDto guitarist) {
         return service.createGuitarist(guitarist);
@@ -78,24 +78,24 @@ public class GuitaristController {
     }
 
     //get request at url returns single object from id
-    @GetMapping("/guitarist/{id}")
+    @GetMapping("/guitarists/{id}")
     public GuitaristDto findGuitaristById(@PathVariable int id) {
         return service.getOne(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id " + id + " not found."));
     }
 
     //get request at url returns list of all sharing first name (last name and nationality below)
-    @GetMapping("/firstname/{firstname}")
+    @GetMapping("/guitarists/firstname/{firstname}")
     public List<GuitaristDto> findAllByFirstName(@PathVariable String firstname) {
         return service.findGuitaristsByFirst(firstname);
     }
 
-    @GetMapping("lastname/{lastname}")
+    @GetMapping("/guitarists/lastname/{lastname}")
     public List<GuitaristDto> findAllByLastName(@PathVariable String lastname) {
         return service.findGuitaristsByLast(lastname);
     }
 
-    @GetMapping("nationality/{nationality}")
+    @GetMapping("/guitarists/nationality/{nationality}")
     public List<GuitaristDto> findAllByNationality(@PathVariable String nationality) {
         return service.findGuitaristsByNationality(nationality);
     }
@@ -125,7 +125,7 @@ public class GuitaristController {
 
 
     //DELETE METHODS
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/guitarists/delete/{id}")
     public String deleteGuitarist(@PathVariable int id) {
         service.delete(id);
         return "Guitarist with id " + id + " has been deleted.";
