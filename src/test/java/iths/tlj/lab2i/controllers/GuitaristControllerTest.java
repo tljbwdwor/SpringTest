@@ -26,25 +26,6 @@ class GuitaristControllerTest {
     //Initialising outside of methods which can all call
     GuitaristController guitaristController = new GuitaristController(new TestService());
 
-   /*@BeforeEach
-    void addFreshTestData() {
-        TestGuitarist a = testGuitaristRepository
-                .save(new TestGuitarist(0,"A","A","A"));
-        TestGuitarist b = testGuitaristRepository
-                .save(new TestGuitarist(0,"B","B","B"));
-        TestGuitarist c = testGuitaristRepository
-                .save(new TestGuitarist(0,"C","C","C"));
-        TestGuitarist d = testGuitaristRepository
-                .save(new TestGuitarist(0,"D","D","D"));
-        TestGuitarist e = testGuitaristRepository
-                .save(new TestGuitarist(0,"E","E","E"));
-
-    }*/
-
-    /*@AfterEach
-    void emptyTestData() {
-        testGuitaristRepository.deleteAll();
-    }*/
 
     @Test
     public void testingTestDbObjectCreation() {

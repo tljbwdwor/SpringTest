@@ -1,21 +1,28 @@
 package iths.tlj.lab2i;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import iths.tlj.lab2i.dtos.GuitaristDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//this is instead of @BeforeEach
+@Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class Lab2iApplicationTests {
 
     @LocalServerPort
@@ -271,17 +278,12 @@ class Lab2iApplicationTests {
     }
 
 
-/*
-
-    //TO DO- fix parsing error in search methods. Fix delete test method.
-    //check out https://medium.com/swlh/https-medium-com-jet-cabral-testing-spring-boot-restful-apis-b84ea031973d
-
+    //DELETE
     @Test
     public void deleteByIdReturnsNoContent204() {
         HttpHeaders header = new HttpHeaders();
         header.add("Accept","application.xml");
         header.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity entity = new HttpEntity(header);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
@@ -289,36 +291,86 @@ class Lab2iApplicationTests {
 
         var result = this.restTemplate
                 .exchange("http://localhost:" + port + "/guitarists/delete/1", HttpMethod.DELETE, null,
-                        GuitaristDto.class);
+                        Void.class);
 
-        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
-        assertNull(result.getBody());
-
-        // Double check the guitarist has been deleted from embedded H2 db
-        //Optional<GuitaristDto> guitarist = TestGuitaristRepository.findById(1);
-        //assertFalse(guitarist.isPresent());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
-    //SEARCH BY FIRST
+    //SEARCH
     @Test
-    void getByFirstReturnsOkAndJson() {
+    void searchNationalityReturnsOkAndJson() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application/json");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/search/3?nationality=a",
+                GuitaristDto[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertTrue(result.hasBody());
+        assertThat(result.getBody().length).isEqualTo(2);
+    }
+
+    @Test
+    void searchFirstNameReturnsOkAndJson() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application/json");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/search/1?firstname=a",
+                GuitaristDto[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertTrue(Arrays.stream(result.getBody()).findFirst().get().getFirstName().contains("Shawn"));
+        assertThat(result.getBody().length).isEqualTo(1);
+    }
+
+    @Test
+    void searchLastNameReturnsOkAndJson() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application/json");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/search/2?lastname=a",
+                GuitaristDto[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Arrays.stream(result.getBody()).findFirst().get().getLastName()).isEqualTo("Lane");
+        assertThat(result.getBody().length).isEqualTo(2);
+    }
+
+    //INVALID SEARCH
+    @Test
+    void searchNationalityInvalidReturnsOkAndJson() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Accept","application/json");
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/search/3?nationality=z",
+                GuitaristDto[].class);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getBody().length).isEqualTo(0);
+    }
+
+    //GET ALL by element
+    @Test
+    void getByFirstReturnsJson200() {
+
+
         HttpHeaders header = new HttpHeaders();
         header.add("Accept","application.xml");
         header.setContentType(MediaType.APPLICATION_JSON);
 
-        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/firstname/jimi",
-                GuitaristDto[].class);
+        var result = restTemplate.exchange("http://localhost:" + port + "/guitarists/firstname/Jimi",HttpMethod.GET,
+                null, new ParameterizedTypeReference<List<GuitaristDto>>(){});
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertTrue(result.hasBody());
-        assertThat(Arrays.stream(result.getBody()).findFirst().get().getLastName()).isEqualTo("Hendrix");
+        assertThat(result.getBody().get(0).getLastName()).isEqualTo("Hendrix");
     }
 
     @Test
-    void testingGetOneByFirstWithDb() {
+    void testingGetOneByFirstReturnsJson200() {
         HttpHeaders header = new HttpHeaders();
         header.add("Accept","application.xml");
-        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/firstname/jimi",
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/firstname/Jimi",
                 GuitaristDto[].class);
 
 
@@ -329,14 +381,16 @@ class Lab2iApplicationTests {
     }
 
     @Test
-    void testingGetByLastWithDb() {
+    void testingGetByLastReturnsJson200() {
         HttpHeaders header = new HttpHeaders();
         header.add("Accept","application.xml");
-        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/lastname/hendrix",
+        var result = restTemplate.getForEntity("http://localhost:" + port + "/guitarists/lastname/Hendrix",
                 GuitaristDto[].class);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertTrue(result.hasBody());
         assertThat(Arrays.stream(result.getBody()).findFirst().get().getFirstName()).isEqualTo("Jimi");
         assertThat(result.getBody().length).isEqualTo(1);
-    }*/
+    }
 }
+
+//check out https://medium.com/swlh/https-medium-com-jet-cabral-testing-spring-boot-restful-apis-b84ea031973d
