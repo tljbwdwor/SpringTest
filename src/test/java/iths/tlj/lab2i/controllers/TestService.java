@@ -80,4 +80,19 @@ public class TestService implements Service {
     public void delete(int id) {
 
     }
+
+    @Override
+    public List<GuitaristDto> searchByFirst(String term) {
+        return null;
+    }
+
+    @Override
+    public List<GuitaristDto> searchByLast(String term) {
+        return null;
+    }
+
+    @Override
+    public List<GuitaristDto> searchByNationality(String term) {
+        return null;
+    }
 }

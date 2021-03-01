@@ -26,4 +26,8 @@ public interface Service {
     GuitaristDto updateNationality(int id, NationalityDto nationalityDto);
 
     void delete(int id);
+
+    List<GuitaristDto> searchByFirst(String term);
+    List<GuitaristDto> searchByLast(String term);
+    List<GuitaristDto> searchByNationality(String term);
 }

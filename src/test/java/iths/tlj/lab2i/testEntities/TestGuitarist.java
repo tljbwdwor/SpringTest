@@ -1,11 +1,13 @@
 package iths.tlj.lab2i.testEntities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Data
 @Entity
+@NoArgsConstructor
 //@Table(name="guitarists")
 
 public class TestGuitarist {
@@ -23,9 +25,4 @@ public class TestGuitarist {
         this.lastname = lastname;
         this.nationality = nationality;
     }
-
-    public TestGuitarist() {
-
-    }
-
 }

@@ -7,6 +7,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name="guitarists")
+@NoArgsConstructor
 
 public class Guitarist {
 
@@ -23,9 +24,4 @@ public class Guitarist {
         this.lastName = lastName;
         this.nationality = nationality;
     }
-
-    public Guitarist() {
-
-    }
-
 }

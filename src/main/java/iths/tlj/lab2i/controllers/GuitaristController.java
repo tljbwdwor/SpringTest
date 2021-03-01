@@ -84,28 +84,13 @@ public class GuitaristController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Id " + id + " not found."));
     }
 
-    //get request at url returns list of all sharing first name (last name and nationality below)
-    @GetMapping("/guitarists/firstname/{firstname}")
-    public List<GuitaristDto> findAllByFirstName(@PathVariable String firstname) {
-        return service.findGuitaristsByFirst(firstname);
-    }
-
-    @GetMapping("/guitarists/lastname/{lastname}")
-    public List<GuitaristDto> findAllByLastName(@PathVariable String lastname) {
-        return service.findGuitaristsByLast(lastname);
-    }
-
-    @GetMapping("/guitarists/nationality/{nationality}")
-    public List<GuitaristDto> findAllByNationality(@PathVariable String nationality) {
-        return service.findGuitaristsByNationality(nationality);
-    }
-
 
     //REPLACE (PUT) METHODS
     @PutMapping("/guitarists/{id}")
     public GuitaristDto replace(@RequestBody GuitaristDto guitaristDto, @PathVariable int id){
         return service.replace(id, guitaristDto);
     }
+
 
     //UPDATE (PATCH) METHODS
     @PatchMapping("/guitarists/firstname/{id}")
@@ -129,5 +114,38 @@ public class GuitaristController {
     public String deleteGuitarist(@PathVariable int id) {
         service.delete(id);
         return "Guitarist with id " + id + " has been deleted.";
+    }
+
+    //SEARCH METHODS
+    //get request at url returns list of all sharing first name (last name and nationality below)
+    @GetMapping("/guitarists/firstname/{firstname}")
+    public List<GuitaristDto> findAllByFirstName(@PathVariable String firstname) {
+        return service.findGuitaristsByFirst(firstname);
+    }
+
+    @GetMapping("/guitarists/lastname/{lastname}")
+    public List<GuitaristDto> findAllByLastName(@PathVariable String lastname) {
+        return service.findGuitaristsByLast(lastname);
+    }
+
+    @GetMapping("/guitarists/nationality/{nationality}")
+    public List<GuitaristDto> findAllByNationality(@PathVariable String nationality) {
+        return service.findGuitaristsByNationality(nationality);
+    }
+
+
+    @RequestMapping(value = "/guitarists/search/1", method = RequestMethod.GET)
+    public List<GuitaristDto> searchByFirst(@RequestParam(value = "firstname") String search) {
+        return service.searchByFirst(search);
+    }
+
+    @RequestMapping(value = "/guitarists/search/2", method = RequestMethod.GET)
+    public List<GuitaristDto> searchByLast(@RequestParam(value = "lastname") String search) {
+        return service.searchByLast(search);
+    }
+
+    @RequestMapping(value = "/guitarists/search/3", method = RequestMethod.GET)
+    public List<GuitaristDto> search(@RequestParam(value = "nationality") String search) {
+        return service.searchByNationality(search);
     }
 }

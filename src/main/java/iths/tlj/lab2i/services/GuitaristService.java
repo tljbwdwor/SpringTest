@@ -5,8 +5,11 @@ import iths.tlj.lab2i.dtos.GuitaristDto;
 import iths.tlj.lab2i.dtos.LastNameDto;
 import iths.tlj.lab2i.dtos.NationalityDto;
 import iths.tlj.lab2i.entities.Guitarist;
+import iths.tlj.lab2i.entities.GuitaristSpecification;
+import iths.tlj.lab2i.entities.SearchCriteria;
 import iths.tlj.lab2i.mappers.GuitaristMapper;
 import iths.tlj.lab2i.repositories.GuitaristRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -127,4 +130,25 @@ public class GuitaristService implements iths.tlj.lab2i.services.Service {
     }
 
 
+    //SEARCH METHODS
+    @Override
+    public List<GuitaristDto> searchByFirst(String term) {
+        GuitaristSpecification gs = new GuitaristSpecification(new SearchCriteria("firstName",":",term));
+
+        return guitaristRepository.findAll(Specification.where(gs));
+    }
+
+    @Override
+    public List<GuitaristDto> searchByLast(String term) {
+        GuitaristSpecification gs = new GuitaristSpecification(new SearchCriteria("lastName",":",term));
+
+        return guitaristRepository.findAll(Specification.where(gs));
+    }
+
+    @Override
+    public List<GuitaristDto> searchByNationality(String term) {
+        GuitaristSpecification gs = new GuitaristSpecification(new SearchCriteria("nationality",":",term));
+
+        return guitaristRepository.findAll(Specification.where(gs));
+    }
 }
